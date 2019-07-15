@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+<meta charset="utf-8">
+<meta name="description" content="The last theme you&#39;ll ever need. Maybe.">
+<meta name="generator" content="Hugo 0.55.6" />
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="/css/style.css" type="text/css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Code+Pro:400,700" type="text/css">
+<link rel="stylesheet"
+      href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.8/styles/ocean.min.css">
+<link rel="alternate" href="/index.xml" type="application/rss+xml" title="TopGrd&#39;s Blog">
+<title>React 绑定this 三种方式对比 - TopGrd&#39;s Blog</title>
+</head>
+<body>
+
+<header>
+  <div class="container clearfix">
+    <a class="path" href="http://topgrd.github.io/">[TopGrd&#39;s Blog]</a>
+    <span class="caret"># _</span>
+    <div class="right">
+      
+    </div>
+  </div>
+</header>
+
+<div class="container">
+
+
+<main role="main" class="article">
+  
+<article class="single" itemscope itemtype="http://schema.org/BlogPosting">
+  <div class="meta">
+
+    <span class="key">published on</span>
+    <span class="val"><time itemprop="datePublished" datetime="2018-08-22">August 22, 2018</time></span>
+
+
+
+    <br>
+    <span class="key">tags:</span>
+    <span class="val">
+
+        <a href="/tags/react">react</a>
+
+    </span>
+
+  </div>
+  <h1 class="headline" itemprop="headline">React 绑定this 三种方式对比</h1>
+  <section class="body" itemprop="articleBody">
+    <p>在react中，在组件事件上绑定this通常有三种写法</p>
+
+<ol>
+<li>inline function</li>
+</ol>
+
+<pre><code class="language-jsx">   &lt;Button onClick={() =&gt; this.handleChange&gt;&lt;/Button&gt;
+</code></pre>
+
+<ol>
+<li>class properties</li>
+</ol>
+
+<pre><code class="language-js">   class A {
+     handleChange = () =&gt; {
+       coneole.log()
+     }
+   }
+</code></pre>
+
+<ol>
+<li>bind</li>
+</ol>
+
+<pre><code class="language-jsx">   class B {
+     constructor() {
+       this.handleChange = this.handleChange.bind(this)
+     }
+   
+     handleChange() {
+       console.log()
+     }
+   }
+</code></pre>
+
+<p>哪种方法相较而言更适合呢，这个在React的Github Issue里都已经有过多次讨论。<a href="https://github.com/facebook/react/issues/9851">https://github.com/facebook/react/issues/9851</a> 根据Dan Abramov的说法，两者基本一致，但在Facebook内部使用的是第二种方法（calss properties）。</p>
+
+<p>虽然两者基本一致，但是肯定有细微的差别，第二种方法因为目前还不是ES的正式语法，所有需要使用babel插件<code>babel-plugin-transform-class-properties</code>进行转义，下面是babel转换A和B的代码</p>
+
+<pre><code class="language-js">var A = function A() {
+  _classCallCheck(this, A);
+
+  this.handleChange = function () {
+    coneole.log();
+  };
+};
+
+
+var B = function () {
+  function B() {
+    _classCallCheck(this, B);
+
+    this.handleChange = this.handleChange.bind(this);
+  }
+
+  _createClass(B, [{
+    key: &quot;handleChange&quot;,
+    value: function handleChange() {
+      console.log();
+    }
+  }]);
+
+  return B;
+}();
+</code></pre>
+
+<p>我们在这里分别实例化上面代码中的A和B并打印这两个实例，如下图
+<img src="https://user-images.githubusercontent.com/4202848/44456020-1a9ef200-a632-11e8-94f3-3a4fcbe88a49.png" alt="image" /></p>
+
+<p>使用class properties语法的A实例handleChange只存在实例上，使用bind绑定this的在实例和原型上分别存在handleChange方法, 看上去似乎前者的开销比后者小。</p>
+
+<p>性能方面，可以做个测试进行对比，<a href="https://jsperf.com/arrow-function-vs-bound-function-with-100-instances。">https://jsperf.com/arrow-function-vs-bound-function-with-100-instances。</a></p>
+
+<p><img src="https://user-images.githubusercontent.com/4202848/44456039-27234a80-a632-11e8-9f2f-034466f1b8ed.png" alt="image" /></p>
+
+<p>op/s的测试结果显示bind方式比class properties在性能方面更加优秀，但是没有超过50%，优势不是很大。</p>
+
+<p>但是如果如果在constructor中显式bind this，那么在组件中如果含有大量事件，是会拖慢组件初始化速度，是你的应用程序变慢。</p>
+
+<p>有一种说法是如果你的组件性能受到的影响微乎其微，不要过早的进行优化，因为可能带来副作用，只有在观测到时在进行优化。</p>
+
+<p>第一种内联函数方式是最不被人接受的，因为垃圾回收机制和在使用pureComponent ，在组件中内联的使用一个对象会使Shallow Compare 失效，因为总会产生一个新的对象，是严格不相等的，从而引起重新渲染。</p>
+
+<p>但是有中情况是需要从外部传递参数给事件函数，这种情况下我们不得不使用内联函数，有一种解决方案是讲数据传递到html的表单元素上，通过e.target.value获取。</p>
+
+<pre><code class="language-jsx">class C {
+    handleClick = (e) =&gt; {
+        const id = e.target.value
+        // do something
+    }
+    
+    render() {
+        const id = {this.state}
+        return (&lt;button value={id} onClick={this.handleClick}&gt;提交&lt;/button&gt;)
+    }
+}
+</code></pre>
+
+<p>还有一种解决方案是提取子组件，具体可以看这篇文章<a href="https://medium.freecodecamp.org/react-pattern-extract-child-components-to-avoid-binding-e3ad8310725e">https://medium.freecodecamp.org/react-pattern-extract-child-components-to-avoid-binding-e3ad8310725e</a>  但两者都有相应局限性，不是广泛的适用于所有场景。</p>
+
+<p>如果你的组件不是追求极限性能优化或者是拥有超多的子组件，不论采用2和3哪种方式，都是可以的，主要还是看团队规范。</p>
+
+  </section>
+</article>
+
+</main>
+
+</div>
+
+<footer>
+  <div class="container">
+    <span class="copyright">&copy; 2019 TopGrd&#39;s Blog - <a rel="license" href="http://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a></span>
+  </div>
+</footer>
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.8/highlight.min.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+</body>
+</html>
+

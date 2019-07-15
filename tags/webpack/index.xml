@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>webpack on TopGrd&#39;s Blog</title>
+    <link>http://topgrd.github.io/tags/webpack/</link>
+    <description>Recent content in webpack on TopGrd&#39;s Blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-cn</language>
+    <lastBuildDate>Wed, 10 Jul 2019 10:08:21 +0000</lastBuildDate>
+    
+	<atom:link href="http://topgrd.github.io/tags/webpack/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>webpack 模块化原理</title>
+      <link>http://topgrd.github.io/post/10/</link>
+      <pubDate>Wed, 10 Jul 2019 10:08:21 +0000</pubDate>
+      
+      <guid>http://topgrd.github.io/post/10/</guid>
+      <description>定义 mark.js
+export const val = &#39;sd&#39;; export default () =&amp;gt; { console.log(&#39;jaja&#39;); };  index.js
+import mark from &#39;./mark&#39;; const name = &#39;jack&#39;; mark(); export default name;  下面的代码是 webpack 打包后生成的代码
+(function(modules) { // webpackBootstrap // The module cache var installedModules = {}; // The require function function __webpack_require__(moduleId) { // Check if module is in cache if (installedModules[moduleId]) { return installedModules[moduleId].exports; } // Create a new module (and put it into the cache) var module = (installedModules[moduleId] = { i: moduleId, l: false, exports: {}, }); // Execute the module function modules[moduleId].</description>
+    </item>
+    
+    <item>
+      <title>NPM 发布ESM源码</title>
+      <link>http://topgrd.github.io/post/6/</link>
+      <pubDate>Wed, 26 Jun 2019 08:39:04 +0000</pubDate>
+      
+      <guid>http://topgrd.github.io/post/6/</guid>
+      <description>Background &amp;amp; Research 如果你调试的时候需要看所依赖的npm包的源码,一般包的入口main都指向dist里被babel或rollup编译过的es5代码。
+{ &amp;quot;name&amp;quot;: &amp;quot;my-package&amp;quot;, &amp;quot;version&amp;quot;: &amp;quot;0.1.0&amp;quot;, &amp;quot;main&amp;quot;: &amp;quot;dist/index.js&amp;quot; }  会指示你的打包工具在require 或 import的时候找到正确的入口文件在哪，但是现在有种更推荐的方式是同时发布编译后的 es5 代码和 es2015+ 源码，让用户选择。
+Why?  es2015后，如果使用webpack或rollup构建，可以利用ES Module的很多特性, 加快打包速度, 还可以利用 treeshaking 每个npm包自行编译，很多模块重复引入，增加代码体积（runtime可能不同） 转译的结果是固定的，不能根据平台和市场自定义化 如果编译工具产生隐藏的bug代码，发布到npm上，被大量下载，即使用户编译工具修复了bug，也无法影响包中的源码，只能等待维护者修复。 发布多种版本库在业内已成为一种标准  How? publish 将 package.json 的main直接指向es6代码，会产生2个问题。
+ 在基本上用户webpack编译的时候会选择exclude掉 node_modules下的文件, 这样可以极大的提升编译速度。所以默认都是在npm上发布es5规范的代码。 如果是node环境的代码，说不会经过构建工具的，不支持es6的话直接运行不起了  因此 package.json 中的main指向es5版本代码，要解决这个问题，rollup提出了module字段，现在也被webpack等构建工具所支持。当构建工具遇到我们的模块时，优先使用module字段入口。然后使用main入口。
+创建 library
+webpack config exclude替换为inclue
+{ test: /\.(js|jsx)$/, - exclude: /node_modules/, + include: [ + path.resolve(&#39;./src&#39;), + path.resolve(&#39;./node_modules/carno&#39;) + ], use: { loader: &#39;babel-loader&#39;, }, }  Research 这里取redux模块进行研究</description>
+    </item>
+    
+  </channel>
+</rss>

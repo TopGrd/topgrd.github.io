@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+<meta charset="utf-8">
+<meta name="description" content="The last theme you&#39;ll ever need. Maybe.">
+<meta name="generator" content="Hugo 0.55.6" />
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="/css/style.css" type="text/css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Code+Pro:400,700" type="text/css">
+<link rel="stylesheet"
+      href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.8/styles/ocean.min.css">
+<link rel="alternate" href="/index.xml" type="application/rss+xml" title="TopGrd&#39;s Blog">
+<title>webpack - TopGrd&#39;s Blog</title>
+</head>
+<body>
+
+<header>
+  <div class="container clearfix">
+    <a class="path" href="http://topgrd.github.io/">[TopGrd&#39;s Blog]</a>
+    <span class="caret"># _</span>
+    <div class="right">
+      
+    </div>
+  </div>
+</header>
+
+<div class="container">
+
+
+<main role="main" class="article-list">
+  <h1 class="list-title">webpack</h1>
+  
+    <article class="list-item" itemscope itemtype="http://schema.org/Blog">
+  <h2 class="headline" itemprop="headline"><a href="/post/10/">webpack 模块化原理</a></h2>
+  <div class="meta">
+
+    <span class="key">published on</span>
+    <span class="val"><time itemprop="datePublished" datetime="2019-07-10">July 10, 2019</time></span>
+
+  </div>
+  <section class="summary">
+    定义 mark.js
+export const val = 'sd'; export default () =&gt; { console.log('jaja'); };  index.js
+import mark from './mark'; const name = 'jack'; mark(); export default name;  下面的代码是 webpack 打包后生成的代码
+(function(modules) { // webpackBootstrap // The module cache var installedModules = {}; // The require function function __webpack_require__(moduleId) { // Check if module is in cache if (installedModules[moduleId]) { return installedModules[moduleId].exports; } // Create a new module (and put it into the cache) var module = (installedModules[moduleId] = { i: moduleId, l: false, exports: {}, }); // Execute the module function modules[moduleId].  <a href="/post/10/">Read More...</a>
+  </section>
+</article>
+
+  
+    <article class="list-item" itemscope itemtype="http://schema.org/Blog">
+  <h2 class="headline" itemprop="headline"><a href="/post/6/">NPM 发布ESM源码</a></h2>
+  <div class="meta">
+
+    <span class="key">published on</span>
+    <span class="val"><time itemprop="datePublished" datetime="2019-06-26">June 26, 2019</time></span>
+
+  </div>
+  <section class="summary">
+    Background &amp; Research 如果你调试的时候需要看所依赖的npm包的源码,一般包的入口main都指向dist里被babel或rollup编译过的es5代码。
+{ &quot;name&quot;: &quot;my-package&quot;, &quot;version&quot;: &quot;0.1.0&quot;, &quot;main&quot;: &quot;dist/index.js&quot; }  会指示你的打包工具在require 或 import的时候找到正确的入口文件在哪，但是现在有种更推荐的方式是同时发布编译后的 es5 代码和 es2015+ 源码，让用户选择。
+Why?  es2015后，如果使用webpack或rollup构建，可以利用ES Module的很多特性, 加快打包速度, 还可以利用 treeshaking 每个npm包自行编译，很多模块重复引入，增加代码体积（runtime可能不同） 转译的结果是固定的，不能根据平台和市场自定义化 如果编译工具产生隐藏的bug代码，发布到npm上，被大量下载，即使用户编译工具修复了bug，也无法影响包中的源码，只能等待维护者修复。 发布多种版本库在业内已成为一种标准  How? publish 将 package.json 的main直接指向es6代码，会产生2个问题。
+ 在基本上用户webpack编译的时候会选择exclude掉 node_modules下的文件, 这样可以极大的提升编译速度。所以默认都是在npm上发布es5规范的代码。 如果是node环境的代码，说不会经过构建工具的，不支持es6的话直接运行不起了  因此 package.json 中的main指向es5版本代码，要解决这个问题，rollup提出了module字段，现在也被webpack等构建工具所支持。当构建工具遇到我们的模块时，优先使用module字段入口。然后使用main入口。
+创建 library
+webpack config exclude替换为inclue
+{ test: /\.(js|jsx)$/, - exclude: /node_modules/, + include: [ + path.resolve('./src'), + path.resolve('./node_modules/carno') + ], use: { loader: 'babel-loader', }, }  Research 这里取redux模块进行研究  <a href="/post/6/">Read More...</a>
+  </section>
+</article>
+
+  
+</main>
+
+
+</div>
+
+<footer>
+  <div class="container">
+    <span class="copyright">&copy; 2019 TopGrd&#39;s Blog - <a rel="license" href="http://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a></span>
+  </div>
+</footer>
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.8/highlight.min.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+</body>
+</html>
+

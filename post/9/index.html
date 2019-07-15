@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+<meta charset="utf-8">
+<meta name="description" content="The last theme you&#39;ll ever need. Maybe.">
+<meta name="generator" content="Hugo 0.55.6" />
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="/css/style.css" type="text/css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Code+Pro:400,700" type="text/css">
+<link rel="stylesheet"
+      href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.8/styles/ocean.min.css">
+<link rel="alternate" href="/index.xml" type="application/rss+xml" title="TopGrd&#39;s Blog">
+<title>模拟 React Hooks - TopGrd&#39;s Blog</title>
+</head>
+<body>
+
+<header>
+  <div class="container clearfix">
+    <a class="path" href="http://topgrd.github.io/">[TopGrd&#39;s Blog]</a>
+    <span class="caret"># _</span>
+    <div class="right">
+      
+    </div>
+  </div>
+</header>
+
+<div class="container">
+
+
+<main role="main" class="article">
+  
+<article class="single" itemscope itemtype="http://schema.org/BlogPosting">
+  <div class="meta">
+
+    <span class="key">published on</span>
+    <span class="val"><time itemprop="datePublished" datetime="2019-07-06">July 06, 2019</time></span>
+
+
+
+    <br>
+    <span class="key">tags:</span>
+    <span class="val">
+
+        <a href="/tags/react">react</a>
+
+    </span>
+
+  </div>
+  <h1 class="headline" itemprop="headline">模拟 React Hooks</h1>
+  <section class="body" itemprop="articleBody">
+    <p>首先 我们先模拟一个useState</p>
+
+<pre><code class="language-js">function useState(initVal) {
+  let _val = initVal;
+  const state = _val;
+  function setState(newVal) {
+    _val = newVal;
+  }
+
+  return [state, setState];
+}
+
+const [count, setCount] = useState(0);
+
+console.log(count);
+
+setCount(2);
+
+console.log(count);
+</code></pre>
+
+<p>但是log 出来的count并不是我们所期望的 0 2，而是 0 0; 为什么呢？ 因为在[count, setCount] = useState(0)count 复制的是 initVal, 修改 _val 的值， 而 count 仍然是initVal的值</p>
+
+<p>如何让他恢复正常呢，我们可以使用方法来获取state</p>
+
+<pre><code class="language-js">function useState(initVal) {
+  let _val = initVal;
+  const state = () =&gt; _val;
+  function setState(newVal) {
+    _val = newVal;
+  }
+
+  return [state, setState];
+}
+
+const [count, setCount] = useState(0);
+
+console.log(count());
+
+setCount(2);
+
+console.log(count());
+</code></pre>
+
+<p>但是如果我们想真正模拟Hooks，就不能这样做。</p>
+
+<p>我们可以用如下代码模拟 React, 主要使用闭包和数组模拟Hook，使用 hook[index] 存放 state 或者 依赖</p>
+
+<pre><code class="language-js">// module pattern
+const React = (function() {
+  let hooks = []; // 存放所以使用的 hook
+  let idx = 0; // hook 指针，来保证 hook 顺序的正常调用
+  function useState(initVal) {
+    const state = hooks[idx] || initVal;
+    const _idx = idx; // _idx 确保 setState 修改的是同一个state 
+    function setState(newVal) {
+      hooks[_idx] = newVal;
+    }
+
+    idx++; // 如果再使用 useState, 指向 hook 数组的下一个
+
+    return [state, setState];
+  }
+
+  function useEffect(callback, deps) {
+    const oldDeps = hooks[idx];
+    let hasChange = true;
+
+    if (oldDeps) {
+      hasChange = deps.some((dep, i) =&gt; !Object.is(dep, oldDeps[i]));
+    }
+
+    if (hasChange) callback();
+    hooks[idx] = deps;
+    idx++; // 如果再使用 useEffect, 指向 hook 数组的下一个
+  }
+
+  function render(Component) {
+    const C = Component();
+    C.render();
+    idx = 0; // 每次 render 重置，确保 hooks 指针顺序
+    return C;
+  }
+
+  return {
+    Component,
+    render,
+    useState,
+    useEffect
+  };
+})();
+
+const { useState, useEffect, render } = React;
+
+function Component() {
+  const [count, setCount] = useState(0);
+  const [type, setType] = useState(&quot;&quot;);
+
+  useEffect(() =&gt; {
+    console.log(&quot;jack&quot;);
+  }, [count]);
+
+  return {
+    render: () =&gt; {
+      document.body.innerHTML = &quot;&quot;;
+      const div = document.createElement(&quot;div&quot;);
+      div.innerText = count;
+      document.body.appendChild(div);
+    },
+    click: () =&gt; setCount(count + 1),
+    type: () =&gt; setType(&quot;apple&quot;),
+    say: () =&gt; console.log(count, type)
+  };
+}
+
+let App = render(Component);
+
+setInterval(() =&gt; {
+  App.click();
+  App = render(Component); // 模拟 rerender
+}, 1000);
+</code></pre>
+
+<p>效果看下面连接</p>
+
+<p><a href="https://codesandbox.io/s/mock-react-hooks-97zzh">mock react hooks</a></p>
+
+  </section>
+</article>
+
+</main>
+
+</div>
+
+<footer>
+  <div class="container">
+    <span class="copyright">&copy; 2019 TopGrd&#39;s Blog - <a rel="license" href="http://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a></span>
+  </div>
+</footer>
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.8/highlight.min.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+</body>
+</html>
+

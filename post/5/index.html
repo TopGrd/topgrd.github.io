@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+<meta charset="utf-8">
+<meta name="description" content="The last theme you&#39;ll ever need. Maybe.">
+<meta name="generator" content="Hugo 0.55.6" />
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="/css/style.css" type="text/css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Code+Pro:400,700" type="text/css">
+<link rel="stylesheet"
+      href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.8/styles/ocean.min.css">
+<link rel="alternate" href="/index.xml" type="application/rss+xml" title="TopGrd&#39;s Blog">
+<title>Node 性能优化与问题排查 - TopGrd&#39;s Blog</title>
+</head>
+<body>
+
+<header>
+  <div class="container clearfix">
+    <a class="path" href="http://topgrd.github.io/">[TopGrd&#39;s Blog]</a>
+    <span class="caret"># _</span>
+    <div class="right">
+      
+    </div>
+  </div>
+</header>
+
+<div class="container">
+
+
+<main role="main" class="article">
+  
+<article class="single" itemscope itemtype="http://schema.org/BlogPosting">
+  <div class="meta">
+
+    <span class="key">published on</span>
+    <span class="val"><time itemprop="datePublished" datetime="2019-06-26">June 26, 2019</time></span>
+
+
+
+    <br>
+    <span class="key">tags:</span>
+    <span class="val">
+
+        <a href="/tags/node">node</a>
+
+    </span>
+
+  </div>
+  <h1 class="headline" itemprop="headline">Node 性能优化与问题排查</h1>
+  <section class="body" itemprop="articleBody">
+    
+
+<p>服务性能指标</p>
+
+<ol>
+<li>吞吐量</li>
+<li>是否存在内存泄露</li>
+</ol>
+
+<h2 id="吞吐量">吞吐量</h2>
+
+<h3 id="qps-tps">QPS (TPS)</h3>
+
+<p>每秒查询率QPS是对一个特定的查询服务器在规定时间内所处理流量多少的衡量标准，通常用来表达和衡量当前系统的负载</p>
+
+<h3 id="并发数">并发数</h3>
+
+<p>系统同时处理的request/事务数</p>
+
+<h3 id="响应时间">响应时间</h3>
+
+<p>一般取平均响应时间</p>
+
+<h3 id="关系">关系</h3>
+
+<p><code>QPS = 并发量 / 平均响应时间</code></p>
+
+<blockquote>
+<p>一个系统吞吐量通常由QPS（TPS）、并发数两个因素决定，每套系统这两个值都有一个相对极限值，在应用场景访问压力下，只要某一项达 到系统最高值，系统的吞吐量就上不去了，如果压力继续增大，系统的吞吐量反而会下降，原因是系统超负荷工作，上下文切换、内存等等其它消耗导致系统性能下 降!</p>
+</blockquote>
+
+<p>如果想要提高系统吞吐量，就需要先进行性能测试，测出系统极限，然后再进行性能调优。</p>
+
+<h3 id="使用-jmeter-进行性能测试">使用 JMeter 进行性能测试</h3>
+
+<p><a href="https://jmeter.apache.org/download_jmeter.cgi">Apache JMeter - Download Apache JMeter</a></p>
+
+<p>下载jmeter，然后解压到任意目录，执行bin文件夹下的 <code>jmeter.sh</code>在出现的UI界面上进行对你的node 服务进行相应测试，具体如何测试可以Google。可以测出程序的吞吐量。</p>
+
+<h2 id="内存泄露">内存泄露</h2>
+
+<blockquote>
+<p>内存泄漏（Memory Leak）指由于疏忽或错误造成程序未能释放已经不再使用的内存的情况。</p>
+</blockquote>
+
+<p>如果一个程序存在内存泄露，则随着时间的推移，内存占用越来越来，程序也就会越来越卡，导致系统性能下降，吞吐量下降，因此如果发现你的程序越来越慢，那可能存在内存泄露问题。</p>
+
+<h2 id="性能优化">性能优化</h2>
+
+<p><code>heapdump</code>或使用 <code>v8-profiler</code></p>
+
+<p>这两个工具的原理都是一致的：调用v8引擎暴露的接口：</p>
+
+<p><code>v8::Isolate::GetCurrent()-&gt;GetHeapProfiler()-&gt;TakeHeapSnapshot(title, control)</code></p>
+
+<p>然后将获取的c++对象数据转换为js对象。</p>
+
+<p>这里推荐使用<code>v8-profiler</code>因为多一个cpu快照功能</p>
+
+<p><a href="https://github.com/node-inspector/v8-profiler">node-inspector/v8-profiler</a></p>
+
+<h3 id="快照">快照</h3>
+
+<p>我们为程序添加一个进行快照的路由，在服务一开始运行的时候开始CPU分析并进行第一次堆快照，方便后面对比，服务端接受到这个Get请求时，进行停止分析，并进行堆快照和CPU快照，保存快照文件。</p>
+
+<pre><code>const router = require('koa-router')();
+const fs = require('fs');
+const profiler = require('v8-profiler');
+
+profiler.startProfiling();
+const snapshot1 = profiler.takeSnapshot();
+
+router.get('/profiler', async (ctx) =&gt; {
+  const perf = profiler.stopProfiling();
+  perf
+    .export()
+    .pipe(fs.createWriteStream('profiler.cpuprofile'))
+    .on('finish', () =&gt; perf.delete());
+
+  const snapshot2 = profiler.takeSnapshot();
+
+  snapshot1.export((error, result) =&gt; {
+    if (error) console.log(error);
+    fs.writeFileSync('snapshot1.heapsnapshot', result);
+    snapshot1.delete();
+  });
+
+  snapshot2
+    .export()
+    .pipe(fs.createWriteStream('snapshot2.heapsnapshot'))
+    .on('finish', snapshot2.delete);
+  ctx.body = {
+    msg: 'success take profile',
+  };
+});
+</code></pre>
+
+<p>ok，然后使用Jmeter进行并发测试，在合适的时机请求服务profiler接口，得到3个文件.</p>
+
+<p><code>snapshot1.heapsnapshot</code></p>
+
+<p><code>snapshot2.heapsnapshot</code></p>
+
+<p><code>profiler.cpuprofile</code></p>
+
+<h3 id="分析">分析</h3>
+
+<p>分析方式可以使用chrome devtools进行分析，也可以使用alinode进行分析</p>
+
+<h3 id="使用chrome-devtool-进行分析">使用chrome devtool 进行分析</h3>
+
+<p><img src="https://user-images.githubusercontent.com/4202848/60155028-a9186d00-981b-11e9-9823-3944325e888f.png" alt="image" /></p>
+
+<p>点开Memory面板，左侧边栏右键load，选择刚才的2个heapsnapshot文件，</p>
+
+<p>选择左上角的Comparsion 即对比2次内存使用情况，下面数据 + 即表示增项的内存，- 表示减少的。
+<img src="https://user-images.githubusercontent.com/4202848/60155058-b897b600-981b-11e9-9a26-a24faa1c149f.png" alt="image" /></p>
+
+<p>这样就可以轻松的知道什么在增加，增加里多少。找出异常的点开进行分析。</p>
+
+<p>CPU
+<img src="https://user-images.githubusercontent.com/4202848/60155081-ca795900-981b-11e9-883b-0a3238ade7df.png" alt="image" /></p>
+
+<p>打开JavaScript Profiler 面板，同样load cpuprofile文件，面板会将最耗时的方法放在上面，剔除program和GC消耗，检查最耗时的function来优化。</p>
+
+<h3 id="2-使用alinode进行分析-强烈推荐">2. 使用alinode进行分析（<strong>强烈推荐</strong>）</h3>
+
+<p><a href="https://node.console.aliyun.com/dashboard/#!/owned">阿里云登录 - 欢迎登录阿里云，安全稳定的云计算服务平台</a></p>
+
+<p>登陆alinode，创建新应用，创建好后，打开。</p>
+
+<h3 id="heapsnapshot分析">heapsnapshot分析</h3>
+
+<p>选择上传文件，选择 堆快照，上传刚才的heapsnapshot文件</p>
+
+<p><img src="https://user-images.githubusercontent.com/4202848/60155114-e0871980-981b-11e9-8dcc-97bd0159f736.png" alt="image" /></p>
+
+<p>完成后如下
+<img src="https://user-images.githubusercontent.com/4202848/60155142-ed0b7200-981b-11e9-8b3d-5431394f7dbf.png" alt="image" /></p>
+
+<p>点击分析，会显示出内存泄露可疑点。👍
+<img src="https://user-images.githubusercontent.com/4202848/60155157-f7c60700-981b-11e9-9ef4-7d821349712f.png" alt="image" /></p>
+
+<p>点击Array关键字进去查看详细信息，发现内存占用比例87.35%，再点击具体信息就可以知道哪块内存泄露了。
+<img src="https://user-images.githubusercontent.com/4202848/60155173-001e4200-981c-11e9-822e-3db87583252e.png" alt="image" /></p>
+
+<h3 id="cpu-消耗分析">CPU 消耗分析</h3>
+
+<p>选择上传文件，选择cpu profile，上传刚才的cpu快照。</p>
+
+<p><img src="https://user-images.githubusercontent.com/4202848/60155192-0a404080-981c-11e9-96b6-df77df0105ab.png" alt="image" /></p>
+
+<p>点击分析
+<img src="https://user-images.githubusercontent.com/4202848/60155208-14623f00-981c-11e9-9b14-b20d0ebbadc4.png" alt="image" /></p>
+
+<p>查看火焰图
+<img src="https://user-images.githubusercontent.com/4202848/60155227-1cba7a00-981c-11e9-84ce-5a553f5cdacc.png" alt="image" /></p>
+
+<p>点击分析（devtool），和chrome面板一样，不过会红色显示可能异常的function
+<img src="https://user-images.githubusercontent.com/4202848/60155248-29d76900-981c-11e9-8d5d-99e63d64a3e7.png" alt="image" /></p>
+
+<h2 id="一个真实的案例">一个真实的案例</h2>
+
+<p>kepler 线上服务大量502，是AG访问kepler server得不到响应，kepler server 部署后，内存消耗严重，拖慢程序运行，导致大量链接响应超过10s。</p>
+
+<p>通过alinode对测试服务器上服务进行监控，并取堆快照。发现node程序92%的内存都来源于一个Array数组，并指向配置文件 app.json，</p>
+
+<p><img src="https://user-images.githubusercontent.com/4202848/60155261-352a9480-981c-11e9-89f7-8ed6c2638efc.png" alt="image" /></p>
+
+<p><img src="https://user-images.githubusercontent.com/4202848/60155273-3eb3fc80-981c-11e9-90bd-47cd942c5141.png" alt="image" /></p>
+
+<p>查看相关代码，发现在代码如下</p>
+
+<pre><code>//
+delete require.cache[require.resolve('../configuration/app.json')];  
+const { duration } = require('../configuration/app.json');
+</code></pre>
+
+<p>app.json是可配置的，如果使用require会有缓存问题，因此使用了delete require.cache，结果引起了内存泄露。</p>
+
+<p>查看网上相关 require.cache 文章发现此问题有人踩过，具体解释：</p>
+
+<p>node 源码中关于module 的方法，</p>
+
+<pre><code>function Module(id, parent) {
+  this.id = id;
+  this.exports = {};
+  this.parent = parent;
+  if (parent &amp;&amp; parent.children) {
+    parent.children.push(this);
+  }
+
+  this.filename = null;
+  this.loaded = false;
+  this.children = [];
+}
+</code></pre>
+
+<p>node 在 module.js 中自动为模块添加了引用</p>
+
+<ul>
+<li>delete require.cache 仅仅清除掉了 Module._cache 对文件第一次 require 的实例的引用</li>
+<li>此时父文件 require 实例的 children 数组中的缓存的引用依旧存在 下一次 再 require 此文件时，由于 Module._cache 中不存在，会再生成一次文件对应的 Module 实例，同时给其父文件实例的 children 数组再增加一个引用，这样就造成了泄漏。</li>
+</ul>
+
+  </section>
+</article>
+
+</main>
+
+</div>
+
+<footer>
+  <div class="container">
+    <span class="copyright">&copy; 2019 TopGrd&#39;s Blog - <a rel="license" href="http://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a></span>
+  </div>
+</footer>
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.8/highlight.min.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+</body>
+</html>
+

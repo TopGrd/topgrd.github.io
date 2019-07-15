@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+<meta charset="utf-8">
+<meta name="description" content="The last theme you&#39;ll ever need. Maybe.">
+<meta name="generator" content="Hugo 0.55.6" />
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="/css/style.css" type="text/css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Code+Pro:400,700" type="text/css">
+<link rel="stylesheet"
+      href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.8/styles/ocean.min.css">
+<link rel="alternate" href="/index.xml" type="application/rss+xml" title="TopGrd&#39;s Blog">
+<title>构造函数中的 return - TopGrd&#39;s Blog</title>
+</head>
+<body>
+
+<header>
+  <div class="container clearfix">
+    <a class="path" href="http://topgrd.github.io/">[TopGrd&#39;s Blog]</a>
+    <span class="caret"># _</span>
+    <div class="right">
+      
+    </div>
+  </div>
+</header>
+
+<div class="container">
+
+
+<main role="main" class="article">
+  
+<article class="single" itemscope itemtype="http://schema.org/BlogPosting">
+  <div class="meta">
+
+    <span class="key">published on</span>
+    <span class="val"><time itemprop="datePublished" datetime="2019-07-15">July 15, 2019</time></span>
+
+
+
+  </div>
+  <h1 class="headline" itemprop="headline">构造函数中的 return</h1>
+  <section class="body" itemprop="articleBody">
+    <pre><code class="language-javascript">class Parent {
+  constructor() {
+    this.name = 'tom';
+    return { aa: 1 };
+  }
+}
+
+class Child extends Parent {
+  constructor() {
+    super();
+    this.name = 'sd';
+  }
+}
+
+const child = new Child();
+
+console.log(child);
+</code></pre>
+
+<p>看下编译出的代码</p>
+
+<pre><code class="language-javascript">var Parent = function Parent() {
+  _classCallCheck(this, Parent);
+
+  this.name = 'tom';
+  return { aa: 1 };
+};
+
+var Child = (function(_Parent) {
+  _inherits(Child, _Parent);
+
+  function Child() {
+    _classCallCheck(this, Child);
+
+    var _this = _possibleConstructorReturn(
+      this,
+      (Child.__proto__ || Object.getPrototypeOf(Child)).call(this),
+    );
+
+    _this.name = 'jack';
+    return _this;
+  }
+
+  return Child;
+})(Parent);
+
+var child = new Child();
+</code></pre>
+
+<p><img src="http://ww3.sinaimg.cn/large/006tNc79gy1g50g4j2s0tj305y03u3yh.jpg" alt="" /></p>
+
+<p>奇怪的是 aa 为什么会跑到 child 上去</p>
+
+<p>关键是 _possibleConstructorReturn 函数</p>
+
+<pre><code class="language-javascript">function _possibleConstructorReturn(self, call) {
+  if (!self) {
+    throw new ReferenceError(
+      &quot;this hasn't been initialised - super() hasn't been called&quot;,
+    );
+  }
+  return call &amp;&amp; (typeof call === 'object' || typeof call === 'function')
+    ? call
+    : self;
+}
+</code></pre>
+
+<p>Child inherits Parent 继承父类，<code>_possibleConstructorReturn()</code>传入的是参数是 child 的 this，和 <code>Parent.call(this)</code>, <code>parent.call(this)</code> 返回的是<code>{ aa: 1 }</code> .所以相当于<code>_possibleConstructorReturn(this, { aa: 1 })</code>，根据这个函数里的内容，这里应该返回第二个参数 <code>call</code>，也就是 <code>{ aa: 1 }</code>，所以 <code>_this</code> 就是 <code>{ aa: 1}</code><br />
+所以得到的结论是如果<code>constructor</code>里调用<code>super()</code>,并且父类的构造函数有返回值，返回值是一个对象的话或者 <code>function</code>，那么子类中的 <code>this</code> 就先被赋予这个值</p>
+
+  </section>
+</article>
+
+</main>
+
+</div>
+
+<footer>
+  <div class="container">
+    <span class="copyright">&copy; 2019 TopGrd&#39;s Blog - <a rel="license" href="http://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a></span>
+  </div>
+</footer>
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.8/highlight.min.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+</body>
+</html>
+

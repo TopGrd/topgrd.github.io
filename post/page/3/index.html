@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+<meta charset="utf-8">
+<meta name="description" content="The last theme you&#39;ll ever need. Maybe.">
+<meta name="generator" content="Hugo 0.55.6" />
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="/css/style.css" type="text/css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Code+Pro:400,700" type="text/css">
+<link rel="stylesheet"
+      href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.8/styles/ocean.min.css">
+<link rel="alternate" href="/index.xml" type="application/rss+xml" title="TopGrd&#39;s Blog">
+<title>Articles - TopGrd&#39;s Blog</title>
+</head>
+<body>
+
+<header>
+  <div class="container clearfix">
+    <a class="path" href="http://topgrd.github.io/">[TopGrd&#39;s Blog]</a>
+    <span class="caret"># _</span>
+    <div class="right">
+      
+    </div>
+  </div>
+</header>
+
+<div class="container">
+
+
+<main role="main" class="article-list">
+  <h1 class="list-title">Articles</h1>
+  
+    <article class="list-item" itemscope itemtype="http://schema.org/Blog">
+  <h2 class="headline" itemprop="headline"><a href="/post/5/">Node 性能优化与问题排查</a></h2>
+  <div class="meta">
+
+    <span class="key">published on</span>
+    <span class="val"><time itemprop="datePublished" datetime="2019-06-26">June 26, 2019</time></span>
+
+  </div>
+  <section class="summary">
+    服务性能指标
+ 吞吐量 是否存在内存泄露  吞吐量 QPS (TPS) 每秒查询率QPS是对一个特定的查询服务器在规定时间内所处理流量多少的衡量标准，通常用来表达和衡量当前系统的负载
+并发数 系统同时处理的request/事务数
+响应时间 一般取平均响应时间
+关系 QPS = 并发量 / 平均响应时间
+ 一个系统吞吐量通常由QPS（TPS）、并发数两个因素决定，每套系统这两个值都有一个相对极限值，在应用场景访问压力下，只要某一项达 到系统最高值，系统的吞吐量就上不去了，如果压力继续增大，系统的吞吐量反而会下降，原因是系统超负荷工作，上下文切换、内存等等其它消耗导致系统性能下 降!
+ 如果想要提高系统吞吐量，就需要先进行性能测试，测出系统极限，然后再进行性能调优。
+使用 JMeter 进行性能测试 Apache JMeter - Download Apache JMeter
+下载jmeter，然后解压到任意目录，执行bin文件夹下的 jmeter.sh在出现的UI界面上进行对你的node 服务进行相应测试，具体如何测试可以Google。可以测出程序的吞吐量。
+内存泄露  内存泄漏（Memory Leak）指由于疏忽或错误造成程序未能释放已经不再使用的内存的情况。
+ 如果一个程序存在内存泄露，则随着时间的推移，内存占用越来越来，程序也就会越来越卡，导致系统性能下降，吞吐量下降，因此如果发现你的程序越来越慢，那可能存在内存泄露问题。
+性能优化 heapdump或使用 v8-profiler
+这两个工具的原理都是一致的：调用v8引擎暴露的接口：
+v8::Isolate::GetCurrent()-&gt;GetHeapProfiler()-&gt;TakeHeapSnapshot(title, control)
+然后将获取的c++对象数据转换为js对象。
+这里推荐使用v8-profiler因为多一个cpu快照功能
+node-inspector/v8-profiler
+快照 我们为程序添加一个进行快照的路由，在服务一开始运行的时候开始CPU分析并进行第一次堆快照，方便后面对比，服务端接受到这个Get请求时，进行停止分析，并进行堆快照和CPU快照，保存快照文件。
+const router = require('koa-router')(); const fs = require('fs'); const profiler = require('v8-profiler'); profiler.startProfiling(); const snapshot1 = profiler.  <a href="/post/5/">Read More...</a>
+  </section>
+</article>
+
+  
+    <article class="list-item" itemscope itemtype="http://schema.org/Blog">
+  <h2 class="headline" itemprop="headline"><a href="/post/4/">Prettier &#43; Eslint =&gt; 💖</a></h2>
+  <div class="meta">
+
+    <span class="key">published on</span>
+    <span class="val"><time itemprop="datePublished" datetime="2018-12-03">December 03, 2018</time></span>
+
+  </div>
+  <section class="summary">
+    Prettier 为什么要用 Prettier？ 关于代码风格的圣战，从到底要不要分号，缩进用tab还是space，2个还是4个空格，从未停止过。但是作为现代javascript 开发者，who cares ! 我们使用eslint 就可以轻松的控制团队的代码风格，但是 eslint 在某些方面就无法强制了，下面2份代码
+if (a &lt; 1) { console.log('haha'); }  if (a &lt; 1) { console.log('haha'); }  Eslint 都不会报错，还有 trailing commas，Why you should enforce Dangling Commas for Multiline Statements 等等。而prettier + eslint 可以完美的避免这些风格不统一的问题。当你的风格与团队 eslint 配置有不同时，只需要prettier一下，就可以保持一致，不需要在写代码时关心差异，并且 prettier 也是当前最火的一款 format 工具，很多开源项目下面，你会发现都会有一份 .prettierrc
+ By far the biggest reason for adopting Prettier is to stop all the on-going debates over styles. It is generally accepted that having a common style guide is valuable for a project and team.  <a href="/post/4/">Read More...</a>
+  </section>
+</article>
+
+  
+    <article class="list-item" itemscope itemtype="http://schema.org/Blog">
+  <h2 class="headline" itemprop="headline"><a href="/post/3/">React hooks: not magic, just arrays </a></h2>
+  <div class="meta">
+
+    <span class="key">published on</span>
+    <span class="val"><time itemprop="datePublished" datetime="2018-11-02">November 02, 2018</time></span>
+
+  </div>
+  <section class="summary">
+    https://medium.com/@ryardley/react-hooks-not-magic-just-arrays-cd4f1857236e
+function Info() { const [name, setName] = useState('Topgrd') return ( &lt;div&gt; &lt;h2&gt;{name}&lt;/h2&gt; &lt;input onChange={e =&gt; setName(e.target.value)} /&gt; &lt;/div&gt; ) }   Don’t call Hooks inside loops, conditions, or nested functions Only Call Hooks from React Functions  let state = []; let setters = []; let firstRun = true; let cursor = 0; function createSetter(cursor) { return function setterWithCursor(newVal) { state[cursor] = newVal; }; } export function useState(initVal) { if (firstRun) { state.  <a href="/post/3/">Read More...</a>
+  </section>
+</article>
+
+  
+</main>
+
+  <nav class="paginator">
+    
+    <a class="nav-left" href="/post/page/2/">&lt; Prev</a>
+    
+
+    <span>3 / 4</span>
+
+    
+    <a class="nav-right" href="/post/page/4/">Next &gt;</a>
+    
+  </nav>
+
+
+</div>
+
+<footer>
+  <div class="container">
+    <span class="copyright">&copy; 2019 TopGrd&#39;s Blog - <a rel="license" href="http://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a></span>
+  </div>
+</footer>
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.8/highlight.min.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+</body>
+</html>
+

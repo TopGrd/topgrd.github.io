@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+<meta charset="utf-8">
+<meta name="description" content="The last theme you&#39;ll ever need. Maybe.">
+<meta name="generator" content="Hugo 0.55.6" />
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="/css/style.css" type="text/css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Code+Pro:400,700" type="text/css">
+<link rel="stylesheet"
+      href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.8/styles/ocean.min.css">
+<link rel="alternate" href="/index.xml" type="application/rss+xml" title="TopGrd&#39;s Blog">
+<title>Electron - TopGrd&#39;s Blog</title>
+</head>
+<body>
+
+<header>
+  <div class="container clearfix">
+    <a class="path" href="http://topgrd.github.io/">[TopGrd&#39;s Blog]</a>
+    <span class="caret"># _</span>
+    <div class="right">
+      
+    </div>
+  </div>
+</header>
+
+<div class="container">
+
+
+<main role="main" class="article">
+  
+<article class="single" itemscope itemtype="http://schema.org/BlogPosting">
+  <div class="meta">
+
+    <span class="key">published on</span>
+    <span class="val"><time itemprop="datePublished" datetime="2019-06-28">June 28, 2019</time></span>
+
+
+
+  </div>
+  <h1 class="headline" itemprop="headline">Electron</h1>
+  <section class="body" itemprop="articleBody">
+    
+
+<h2 id="api">Api</h2>
+
+<p><a href="https://github.com/demopark/electron-api-demos-Zh_CN">demopark/electron-api-demos-Zh_CN</a></p>
+
+<pre><code>ELECTRON_MIRROR=https://npm.taobao.org/mirrors/electron/ npm i electron
+</code></pre>
+
+<h2 id="架构">架构</h2>
+
+<h3 id="主进程和渲染器进程">主进程和渲染器进程</h3>
+
+<p>运行<code>package.json</code>的<code>main</code>脚本的进程被称为 <strong>主进程</strong>,一个 Electron 应用总是有且只有一个主进程
+使用了Chromium 来展示 web 页面，Chromium 的多进程架构也被使用到。每个 Electron 中的 web 页面运行在它自己的<strong>渲染进程</strong>中。</p>
+
+<p><img src="https://user-images.githubusercontent.com/4202848/60313585-472e4380-9992-11e9-9c66-e336d4ecf6e3.png" alt="image" />
+<img src="https://user-images.githubusercontent.com/4202848/60313596-4dbcbb00-9992-11e9-903f-adc5ba421ece.png" alt="image" />
+<img src="https://user-images.githubusercontent.com/4202848/60313607-544b3280-9992-11e9-8822-ef57eda94639.png" alt="image" />
+<img src="https://user-images.githubusercontent.com/4202848/60313613-5e6d3100-9992-11e9-87b7-00d0843e61b6.png" alt="image" /></p>
+
+<h3 id="rebuild-native-module">rebuild native-module</h3>
+
+<p>使用的包包含 C++ 的原生实现。所以在 pack 前需先用 electron-rebuild 做 rebuild。</p>
+
+<blockquote>
+<p>rebuild 如果很慢，可能是要翻墙，可尝试 cnpmjs.org 提供的镜像，electron-rebuild -d=<a href="https://gh-contractor-zcbenz.cnpmjs.org/atom-shell/dist/。">https://gh-contractor-zcbenz.cnpmjs.org/atom-shell/dist/。</a>
+GitHub - electron/electron-rebuild: Package to rebuild native Node.js modules against the currently installed Electron version</p>
+</blockquote>
+
+<h2 id="在渲染进程中使用主进程模块">在渲染进程中使用主进程模块</h2>
+
+<p>使用remote api, 在主进程中导出模块, <a href="https://electronjs.org/docs/api/remote">remote | Electron</a></p>
+
+<pre><code>// main services
+const pty = require('node-pty')
+module.exports = { pty }
+// main index.js
+const services = require('./services')
+global.services = services
+// renderer services
+import { remote } from ‘electron’
+const services = remote.getGlobal(‘services’)
+export default services
+// renderer app.js
+import services from './services'
+</code></pre>
+
+<p>另一种方式是<strong>Ipc</strong>通信</p>
+
+<h2 id="electron-中模拟终端">electron 中模拟终端</h2>
+
+<p><a href="https://github.com/xtermjs/xterm.js">https://github.com/xtermjs/xterm.js</a><a href="https://github.com/Microsoft/node-pty/blob/master/examples/electron/renderer.js">node-pty/renderer.js at master</a></p>
+
+<p><a href="https://github.com/Microsoft/node-pty/blob/master/examples/electron/renderer.js">Microsoft/node-pty · GitHub</a></p>
+
+<h3 id="监听进程崩溃">监听进程崩溃</h3>
+
+<pre><code>mainWindow.webContents.on('crashed', () =&gt; {
+    const options = {
+      type: 'info',
+      title: '进程崩溃',
+      message: '这个进程崩溃了',
+      buttons: ['重载', '退出'],
+    }
+
+    dialog.showMessageBox(options, (index) =&gt; {
+      if (index === 0) mainWindow.reload()
+      else mainWindow.close()
+    })
+})
+</code></pre>
+
+<h2 id="renderer进程与main进程通信">renderer进程与main进程通信</h2>
+
+<p>使用ipc通信</p>
+
+<pre><code>const mainWin = createWindow()
+global.windows = {}
+global.windows.home = mainWin
+mainWin.webContent.send('custom-evt', data)
+
+// renderer
+import { ipcRenderer } from electron
+ipcRender.on('custom-evt', data =&gt; {
+    console.log(data)
+})
+</code></pre>
+
+<h2 id="debug">Debug</h2>
+
+<p>使用vscode使用attach方式debug</p>
+
+<pre><code>electron index.dev.js —inspect=5858
+
+{
+  // 使用 IntelliSense 了解相关属性。
+  // 悬停以查看现有属性的描述。
+  // 欲了解更多信息，请访问: https://go.microsoft.com/fwlink/?linkid=830387
+  &quot;version&quot;: &quot;0.2.0&quot;,
+  &quot;configurations&quot;: [
+    {
+      &quot;type&quot;: &quot;node&quot;,
+      &quot;request&quot;: &quot;attach&quot;,
+      &quot;name&quot;: &quot;Attach&quot;,
+      &quot;port&quot;: 5858,
+      &quot;address&quot;: &quot;localhost&quot;
+    }
+  ]
+}
+</code></pre>
+
+<h3 id="electron-npm-script">Electron npm script</h3>
+
+<pre><code># electron-npm script
+export npm_config_target=1.7.10 # Electron's version. Find with ./node_modules/.bin/electron -v
+export npm_config_arch=x64 # The architecture.
+export npm_config_runtime=electron # Tell node-pre-gyp we are building for Electron.
+export npm_config_build_from_source=true # Tell node-pre-gyp to build module from source code.
+npm install $1 # Replace with the first argument passed.
+</code></pre>
+
+<p><a href="https://github.com/electron/electron/issues/8466#issuecomment-274380021">Error: Electron failed to install correctly, please delete node_modules/electron and try installing again · Issue #8466 · electron/electron</a></p>
+
+<p><a href="https://electronjs.org/docs/tutorial/security">Security, Native Capabilities, and Your Responsibility | Electron</a></p>
+
+<h2 id="其它">其它</h2>
+
+<p><a href="https://github.com/sorrycc/blog/issues/13">Electron 应用实战 (架构篇) · Issue #13 · sorrycc/blog · GitHub</a></p>
+
+<p><a href="https://github.com/electron-userland/electron-builder">GitHub - electron-userland/electron-builder: A complete solution to package and build a ready for distribution Electron app with “auto update” support out of the box</a> 基于<code>electron-packager</code></p>
+
+<p><a href="https://github.com/electron/electron-rebuild">GitHub - electron/electron-rebuild: Package to rebuild native Node.js modules against the currently installed Electron version</a></p>
+
+  </section>
+</article>
+
+</main>
+
+</div>
+
+<footer>
+  <div class="container">
+    <span class="copyright">&copy; 2019 TopGrd&#39;s Blog - <a rel="license" href="http://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a></span>
+  </div>
+</footer>
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.8/highlight.min.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+</body>
+</html>
+

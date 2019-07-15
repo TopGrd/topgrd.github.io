@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+<meta charset="utf-8">
+<meta name="description" content="The last theme you&#39;ll ever need. Maybe.">
+<meta name="generator" content="Hugo 0.55.6" />
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="/css/style.css" type="text/css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Code+Pro:400,700" type="text/css">
+<link rel="stylesheet"
+      href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.8/styles/ocean.min.css">
+<link rel="alternate" href="/index.xml" type="application/rss+xml" title="TopGrd&#39;s Blog">
+<title>React hooks: not magic, just arrays  - TopGrd&#39;s Blog</title>
+</head>
+<body>
+
+<header>
+  <div class="container clearfix">
+    <a class="path" href="http://topgrd.github.io/">[TopGrd&#39;s Blog]</a>
+    <span class="caret"># _</span>
+    <div class="right">
+      
+    </div>
+  </div>
+</header>
+
+<div class="container">
+
+
+<main role="main" class="article">
+  
+<article class="single" itemscope itemtype="http://schema.org/BlogPosting">
+  <div class="meta">
+
+    <span class="key">published on</span>
+    <span class="val"><time itemprop="datePublished" datetime="2018-11-02">November 02, 2018</time></span>
+
+
+
+    <br>
+    <span class="key">tags:</span>
+    <span class="val">
+
+        <a href="/tags/medium">medium</a>
+
+    </span>
+
+  </div>
+  <h1 class="headline" itemprop="headline">React hooks: not magic, just arrays </h1>
+  <section class="body" itemprop="articleBody">
+    <p><a href="https://medium.com/@ryardley/react-hooks-not-magic-just-arrays-cd4f1857236e">https://medium.com/@ryardley/react-hooks-not-magic-just-arrays-cd4f1857236e</a></p>
+
+<pre><code class="language-js">function Info() {
+  const [name, setName] = useState('Topgrd')
+
+  return (
+    &lt;div&gt;
+      &lt;h2&gt;{name}&lt;/h2&gt;
+      &lt;input onChange={e =&gt; setName(e.target.value)} /&gt;
+    &lt;/div&gt;
+  )
+}
+
+</code></pre>
+
+<ul>
+<li>Don’t call Hooks inside loops, conditions, or nested functions</li>
+<li>Only Call Hooks from React Functions</li>
+</ul>
+
+<pre><code class="language-js">let state = [];
+let setters = [];
+let firstRun = true;
+let cursor = 0;
+
+function createSetter(cursor) {
+  return function setterWithCursor(newVal) {
+    state[cursor] = newVal;
+  };
+}
+
+export function useState(initVal) {
+  if (firstRun) {
+    state.push(initVal);
+    setters.push(createSetter(cursor));
+    firstRun = false;
+  }
+
+  const setter = setters[cursor];
+  const value = state[cursor];
+
+  cursor++;
+  return [value, setter];
+}
+</code></pre>
+
+  </section>
+</article>
+
+</main>
+
+</div>
+
+<footer>
+  <div class="container">
+    <span class="copyright">&copy; 2019 TopGrd&#39;s Blog - <a rel="license" href="http://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a></span>
+  </div>
+</footer>
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.8/highlight.min.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+</body>
+</html>
+

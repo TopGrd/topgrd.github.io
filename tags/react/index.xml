@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>react on TopGrd&#39;s Blog</title>
+    <link>http://topgrd.github.io/tags/react/</link>
+    <description>Recent content in react on TopGrd&#39;s Blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-cn</language>
+    <lastBuildDate>Sat, 06 Jul 2019 07:25:57 +0000</lastBuildDate>
+    
+	<atom:link href="http://topgrd.github.io/tags/react/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>模拟 React Hooks</title>
+      <link>http://topgrd.github.io/post/9/</link>
+      <pubDate>Sat, 06 Jul 2019 07:25:57 +0000</pubDate>
+      
+      <guid>http://topgrd.github.io/post/9/</guid>
+      <description>首先 我们先模拟一个useState
+function useState(initVal) { let _val = initVal; const state = _val; function setState(newVal) { _val = newVal; } return [state, setState]; } const [count, setCount] = useState(0); console.log(count); setCount(2); console.log(count);  但是log 出来的count并不是我们所期望的 0 2，而是 0 0; 为什么呢？ 因为在[count, setCount] = useState(0)count 复制的是 initVal, 修改 _val 的值， 而 count 仍然是initVal的值
+如何让他恢复正常呢，我们可以使用方法来获取state
+function useState(initVal) { let _val = initVal; const state = () =&amp;gt; _val; function setState(newVal) { _val = newVal; } return [state, setState]; } const [count, setCount] = useState(0); console.</description>
+    </item>
+    
+    <item>
+      <title>React 绑定this 三种方式对比</title>
+      <link>http://topgrd.github.io/post/1/</link>
+      <pubDate>Wed, 22 Aug 2018 09:40:14 +0000</pubDate>
+      
+      <guid>http://topgrd.github.io/post/1/</guid>
+      <description>在react中，在组件事件上绑定this通常有三种写法
+ inline function  &amp;lt;Button onClick={() =&amp;gt; this.handleChange&amp;gt;&amp;lt;/Button&amp;gt;   class properties  class A { handleChange = () =&amp;gt; { coneole.log() } }   bind  class B { constructor() { this.handleChange = this.handleChange.bind(this) } handleChange() { console.log() } }  哪种方法相较而言更适合呢，这个在React的Github Issue里都已经有过多次讨论。https://github.com/facebook/react/issues/9851 根据Dan Abramov的说法，两者基本一致，但在Facebook内部使用的是第二种方法（calss properties）。
+虽然两者基本一致，但是肯定有细微的差别，第二种方法因为目前还不是ES的正式语法，所有需要使用babel插件babel-plugin-transform-class-properties进行转义，下面是babel转换A和B的代码
+var A = function A() { _classCallCheck(this, A); this.handleChange = function () { coneole.log(); }; }; var B = function () { function B() { _classCallCheck(this, B); this.</description>
+    </item>
+    
+  </channel>
+</rss>

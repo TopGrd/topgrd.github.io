@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+<meta charset="utf-8">
+<meta name="description" content="The last theme you&#39;ll ever need. Maybe.">
+<meta name="generator" content="Hugo 0.55.6" />
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="/css/style.css" type="text/css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Code+Pro:400,700" type="text/css">
+<link rel="stylesheet"
+      href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.8/styles/ocean.min.css">
+<link rel="alternate" href="/index.xml" type="application/rss+xml" title="TopGrd&#39;s Blog">
+<title>Articles - TopGrd&#39;s Blog</title>
+</head>
+<body>
+
+<header>
+  <div class="container clearfix">
+    <a class="path" href="http://topgrd.github.io/">[TopGrd&#39;s Blog]</a>
+    <span class="caret"># _</span>
+    <div class="right">
+      
+    </div>
+  </div>
+</header>
+
+<div class="container">
+
+
+<main role="main" class="article-list">
+  <h1 class="list-title">Articles</h1>
+  
+    <article class="list-item" itemscope itemtype="http://schema.org/Blog">
+  <h2 class="headline" itemprop="headline"><a href="/post/2/">React 组件设计原则</a></h2>
+  <div class="meta">
+
+    <span class="key">published on</span>
+    <span class="val"><time itemprop="datePublished" datetime="2018-10-11">October 11, 2018</time></span>
+
+  </div>
+  <section class="summary">
+    组件的设计原则 react-component 这里的大多数组件是 ant design 的底层依赖，他们大都很好的遵循了我们的一些设计原则，这里简单概括下：
+职责清晰、单一职责
+ 组件里的每个模块，分别该承担某一个功能  多个组件 / 模块协同完成一件事，而不是一个组件替其他组件完成本该它自己完成的事情  开放与封闭  属性配置等 API 对外开放；组件内部 dom 及状态的更改、对外封闭  高内聚、低耦合  组件内部通过 callback 方式直接调用，组件与组件之间通过发布订阅的模式通信  避免信息冗余  例如：一个东西能被另一个推导出来，就只使用一个  API 尽量和已知概念保持一致  API 命名：比如 聚焦 常用命名是 focusable 而不是 canFocus 等自己臆想的名字、还有如 * onDeselect 等规范名字。 API 的功能要单一并表意：比如 active 表示活动状态、但不能代替表示 selected 选中状态。   前端组件设计杂谈 
+  </section>
+</article>
+
+  
+    <article class="list-item" itemscope itemtype="http://schema.org/Blog">
+  <h2 class="headline" itemprop="headline"><a href="/post/1/">React 绑定this 三种方式对比</a></h2>
+  <div class="meta">
+
+    <span class="key">published on</span>
+    <span class="val"><time itemprop="datePublished" datetime="2018-08-22">August 22, 2018</time></span>
+
+  </div>
+  <section class="summary">
+    在react中，在组件事件上绑定this通常有三种写法
+ inline function  &lt;Button onClick={() =&gt; this.handleChange&gt;&lt;/Button&gt;   class properties  class A { handleChange = () =&gt; { coneole.log() } }   bind  class B { constructor() { this.handleChange = this.handleChange.bind(this) } handleChange() { console.log() } }  哪种方法相较而言更适合呢，这个在React的Github Issue里都已经有过多次讨论。https://github.com/facebook/react/issues/9851 根据Dan Abramov的说法，两者基本一致，但在Facebook内部使用的是第二种方法（calss properties）。
+虽然两者基本一致，但是肯定有细微的差别，第二种方法因为目前还不是ES的正式语法，所有需要使用babel插件babel-plugin-transform-class-properties进行转义，下面是babel转换A和B的代码
+var A = function A() { _classCallCheck(this, A); this.handleChange = function () { coneole.log(); }; }; var B = function () { function B() { _classCallCheck(this, B); this.  <a href="/post/1/">Read More...</a>
+  </section>
+</article>
+
+  
+</main>
+
+  <nav class="paginator">
+    
+    <a class="nav-left" href="/post/page/3/">&lt; Prev</a>
+    
+
+    <span>4 / 4</span>
+
+    
+    <span class="nav-right faded">Next &gt;</span>
+    
+  </nav>
+
+
+</div>
+
+<footer>
+  <div class="container">
+    <span class="copyright">&copy; 2019 TopGrd&#39;s Blog - <a rel="license" href="http://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a></span>
+  </div>
+</footer>
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.8/highlight.min.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+</body>
+</html>
+

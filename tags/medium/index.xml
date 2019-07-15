@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>medium on TopGrd&#39;s Blog</title>
+    <link>http://topgrd.github.io/tags/medium/</link>
+    <description>Recent content in medium on TopGrd&#39;s Blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-cn</language>
+    <lastBuildDate>Fri, 02 Nov 2018 06:40:46 +0000</lastBuildDate>
+    
+	<atom:link href="http://topgrd.github.io/tags/medium/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>React hooks: not magic, just arrays </title>
+      <link>http://topgrd.github.io/post/3/</link>
+      <pubDate>Fri, 02 Nov 2018 06:40:46 +0000</pubDate>
+      
+      <guid>http://topgrd.github.io/post/3/</guid>
+      <description>https://medium.com/@ryardley/react-hooks-not-magic-just-arrays-cd4f1857236e
+function Info() { const [name, setName] = useState(&#39;Topgrd&#39;) return ( &amp;lt;div&amp;gt; &amp;lt;h2&amp;gt;{name}&amp;lt;/h2&amp;gt; &amp;lt;input onChange={e =&amp;gt; setName(e.target.value)} /&amp;gt; &amp;lt;/div&amp;gt; ) }   Don’t call Hooks inside loops, conditions, or nested functions Only Call Hooks from React Functions  let state = []; let setters = []; let firstRun = true; let cursor = 0; function createSetter(cursor) { return function setterWithCursor(newVal) { state[cursor] = newVal; }; } export function useState(initVal) { if (firstRun) { state.</description>
+    </item>
+    
+  </channel>
+</rss>

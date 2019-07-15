@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Articles on TopGrd&#39;s Blog</title>
+    <link>http://topgrd.github.io/post/</link>
+    <description>Recent content in Articles on TopGrd&#39;s Blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-cn</language>
+    <lastBuildDate>Thu, 02 Mar 2017 12:00:00 -0500</lastBuildDate>
+    
+	<atom:link href="http://topgrd.github.io/post/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>构造函数中的 return</title>
+      <link>http://topgrd.github.io/post/11/</link>
+      <pubDate>Mon, 15 Jul 2019 05:35:56 +0000</pubDate>
+      
+      <guid>http://topgrd.github.io/post/11/</guid>
+      <description>class Parent { constructor() { this.name = &#39;tom&#39;; return { aa: 1 }; } } class Child extends Parent { constructor() { super(); this.name = &#39;sd&#39;; } } const child = new Child(); console.log(child);  看下编译出的代码
+var Parent = function Parent() { _classCallCheck(this, Parent); this.name = &#39;tom&#39;; return { aa: 1 }; }; var Child = (function(_Parent) { _inherits(Child, _Parent); function Child() { _classCallCheck(this, Child); var _this = _possibleConstructorReturn( this, (Child.</description>
+    </item>
+    
+    <item>
+      <title>webpack 模块化原理</title>
+      <link>http://topgrd.github.io/post/10/</link>
+      <pubDate>Wed, 10 Jul 2019 10:08:21 +0000</pubDate>
+      
+      <guid>http://topgrd.github.io/post/10/</guid>
+      <description>定义 mark.js
+export const val = &#39;sd&#39;; export default () =&amp;gt; { console.log(&#39;jaja&#39;); };  index.js
+import mark from &#39;./mark&#39;; const name = &#39;jack&#39;; mark(); export default name;  下面的代码是 webpack 打包后生成的代码
+(function(modules) { // webpackBootstrap // The module cache var installedModules = {}; // The require function function __webpack_require__(moduleId) { // Check if module is in cache if (installedModules[moduleId]) { return installedModules[moduleId].exports; } // Create a new module (and put it into the cache) var module = (installedModules[moduleId] = { i: moduleId, l: false, exports: {}, }); // Execute the module function modules[moduleId].</description>
+    </item>
+    
+    <item>
+      <title>模拟 React Hooks</title>
+      <link>http://topgrd.github.io/post/9/</link>
+      <pubDate>Sat, 06 Jul 2019 07:25:57 +0000</pubDate>
+      
+      <guid>http://topgrd.github.io/post/9/</guid>
+      <description>首先 我们先模拟一个useState
+function useState(initVal) { let _val = initVal; const state = _val; function setState(newVal) { _val = newVal; } return [state, setState]; } const [count, setCount] = useState(0); console.log(count); setCount(2); console.log(count);  但是log 出来的count并不是我们所期望的 0 2，而是 0 0; 为什么呢？ 因为在[count, setCount] = useState(0)count 复制的是 initVal, 修改 _val 的值， 而 count 仍然是initVal的值
+如何让他恢复正常呢，我们可以使用方法来获取state
+function useState(initVal) { let _val = initVal; const state = () =&amp;gt; _val; function setState(newVal) { _val = newVal; } return [state, setState]; } const [count, setCount] = useState(0); console.</description>
+    </item>
+    
+    <item>
+      <title>Electron</title>
+      <link>http://topgrd.github.io/post/8/</link>
+      <pubDate>Fri, 28 Jun 2019 02:51:35 +0000</pubDate>
+      
+      <guid>http://topgrd.github.io/post/8/</guid>
+      <description>Api demopark/electron-api-demos-Zh_CN
+ELECTRON_MIRROR=https://npm.taobao.org/mirrors/electron/ npm i electron  架构 主进程和渲染器进程 运行package.json的main脚本的进程被称为 主进程,一个 Electron 应用总是有且只有一个主进程 使用了Chromium 来展示 web 页面，Chromium 的多进程架构也被使用到。每个 Electron 中的 web 页面运行在它自己的渲染进程中。
+rebuild native-module 使用的包包含 C++ 的原生实现。所以在 pack 前需先用 electron-rebuild 做 rebuild。
+ rebuild 如果很慢，可能是要翻墙，可尝试 cnpmjs.org 提供的镜像，electron-rebuild -d=https://gh-contractor-zcbenz.cnpmjs.org/atom-shell/dist/。 GitHub - electron/electron-rebuild: Package to rebuild native Node.js modules against the currently installed Electron version
+ 在渲染进程中使用主进程模块 使用remote api, 在主进程中导出模块, remote | Electron
+// main services const pty = require(&#39;node-pty&#39;) module.exports = { pty } // main index.</description>
+    </item>
+    
+    <item>
+      <title>JavaScript 命名规范 (转)</title>
+      <link>http://topgrd.github.io/post/7/</link>
+      <pubDate>Fri, 28 Jun 2019 02:32:33 +0000</pubDate>
+      
+      <guid>http://topgrd.github.io/post/7/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>NPM 发布ESM源码</title>
+      <link>http://topgrd.github.io/post/6/</link>
+      <pubDate>Wed, 26 Jun 2019 08:39:04 +0000</pubDate>
+      
+      <guid>http://topgrd.github.io/post/6/</guid>
+      <description>Background &amp;amp; Research 如果你调试的时候需要看所依赖的npm包的源码,一般包的入口main都指向dist里被babel或rollup编译过的es5代码。
+{ &amp;quot;name&amp;quot;: &amp;quot;my-package&amp;quot;, &amp;quot;version&amp;quot;: &amp;quot;0.1.0&amp;quot;, &amp;quot;main&amp;quot;: &amp;quot;dist/index.js&amp;quot; }  会指示你的打包工具在require 或 import的时候找到正确的入口文件在哪，但是现在有种更推荐的方式是同时发布编译后的 es5 代码和 es2015+ 源码，让用户选择。
+Why?  es2015后，如果使用webpack或rollup构建，可以利用ES Module的很多特性, 加快打包速度, 还可以利用 treeshaking 每个npm包自行编译，很多模块重复引入，增加代码体积（runtime可能不同） 转译的结果是固定的，不能根据平台和市场自定义化 如果编译工具产生隐藏的bug代码，发布到npm上，被大量下载，即使用户编译工具修复了bug，也无法影响包中的源码，只能等待维护者修复。 发布多种版本库在业内已成为一种标准  How? publish 将 package.json 的main直接指向es6代码，会产生2个问题。
+ 在基本上用户webpack编译的时候会选择exclude掉 node_modules下的文件, 这样可以极大的提升编译速度。所以默认都是在npm上发布es5规范的代码。 如果是node环境的代码，说不会经过构建工具的，不支持es6的话直接运行不起了  因此 package.json 中的main指向es5版本代码，要解决这个问题，rollup提出了module字段，现在也被webpack等构建工具所支持。当构建工具遇到我们的模块时，优先使用module字段入口。然后使用main入口。
+创建 library
+webpack config exclude替换为inclue
+{ test: /\.(js|jsx)$/, - exclude: /node_modules/, + include: [ + path.resolve(&#39;./src&#39;), + path.resolve(&#39;./node_modules/carno&#39;) + ], use: { loader: &#39;babel-loader&#39;, }, }  Research 这里取redux模块进行研究</description>
+    </item>
+    
+    <item>
+      <title>Node 性能优化与问题排查</title>
+      <link>http://topgrd.github.io/post/5/</link>
+      <pubDate>Wed, 26 Jun 2019 06:05:50 +0000</pubDate>
+      
+      <guid>http://topgrd.github.io/post/5/</guid>
+      <description>服务性能指标
+ 吞吐量 是否存在内存泄露  吞吐量 QPS (TPS) 每秒查询率QPS是对一个特定的查询服务器在规定时间内所处理流量多少的衡量标准，通常用来表达和衡量当前系统的负载
+并发数 系统同时处理的request/事务数
+响应时间 一般取平均响应时间
+关系 QPS = 并发量 / 平均响应时间
+ 一个系统吞吐量通常由QPS（TPS）、并发数两个因素决定，每套系统这两个值都有一个相对极限值，在应用场景访问压力下，只要某一项达 到系统最高值，系统的吞吐量就上不去了，如果压力继续增大，系统的吞吐量反而会下降，原因是系统超负荷工作，上下文切换、内存等等其它消耗导致系统性能下 降!
+ 如果想要提高系统吞吐量，就需要先进行性能测试，测出系统极限，然后再进行性能调优。
+使用 JMeter 进行性能测试 Apache JMeter - Download Apache JMeter
+下载jmeter，然后解压到任意目录，执行bin文件夹下的 jmeter.sh在出现的UI界面上进行对你的node 服务进行相应测试，具体如何测试可以Google。可以测出程序的吞吐量。
+内存泄露  内存泄漏（Memory Leak）指由于疏忽或错误造成程序未能释放已经不再使用的内存的情况。
+ 如果一个程序存在内存泄露，则随着时间的推移，内存占用越来越来，程序也就会越来越卡，导致系统性能下降，吞吐量下降，因此如果发现你的程序越来越慢，那可能存在内存泄露问题。
+性能优化 heapdump或使用 v8-profiler
+这两个工具的原理都是一致的：调用v8引擎暴露的接口：
+v8::Isolate::GetCurrent()-&amp;gt;GetHeapProfiler()-&amp;gt;TakeHeapSnapshot(title, control)
+然后将获取的c++对象数据转换为js对象。
+这里推荐使用v8-profiler因为多一个cpu快照功能
+node-inspector/v8-profiler
+快照 我们为程序添加一个进行快照的路由，在服务一开始运行的时候开始CPU分析并进行第一次堆快照，方便后面对比，服务端接受到这个Get请求时，进行停止分析，并进行堆快照和CPU快照，保存快照文件。
+const router = require(&#39;koa-router&#39;)(); const fs = require(&#39;fs&#39;); const profiler = require(&#39;v8-profiler&#39;); profiler.startProfiling(); const snapshot1 = profiler.</description>
+    </item>
+    
+    <item>
+      <title>Prettier &#43; Eslint =&gt; 💖</title>
+      <link>http://topgrd.github.io/post/4/</link>
+      <pubDate>Mon, 03 Dec 2018 08:14:51 +0000</pubDate>
+      
+      <guid>http://topgrd.github.io/post/4/</guid>
+      <description>Prettier 为什么要用 Prettier？ 关于代码风格的圣战，从到底要不要分号，缩进用tab还是space，2个还是4个空格，从未停止过。但是作为现代javascript 开发者，who cares ! 我们使用eslint 就可以轻松的控制团队的代码风格，但是 eslint 在某些方面就无法强制了，下面2份代码
+if (a &amp;lt; 1) { console.log(&#39;haha&#39;); }  if (a &amp;lt; 1) { console.log(&#39;haha&#39;); }  Eslint 都不会报错，还有 trailing commas，Why you should enforce Dangling Commas for Multiline Statements 等等。而prettier + eslint 可以完美的避免这些风格不统一的问题。当你的风格与团队 eslint 配置有不同时，只需要prettier一下，就可以保持一致，不需要在写代码时关心差异，并且 prettier 也是当前最火的一款 format 工具，很多开源项目下面，你会发现都会有一份 .prettierrc
+ By far the biggest reason for adopting Prettier is to stop all the on-going debates over styles. It is generally accepted that having a common style guide is valuable for a project and team.</description>
+    </item>
+    
+    <item>
+      <title>React hooks: not magic, just arrays </title>
+      <link>http://topgrd.github.io/post/3/</link>
+      <pubDate>Fri, 02 Nov 2018 06:40:46 +0000</pubDate>
+      
+      <guid>http://topgrd.github.io/post/3/</guid>
+      <description>https://medium.com/@ryardley/react-hooks-not-magic-just-arrays-cd4f1857236e
+function Info() { const [name, setName] = useState(&#39;Topgrd&#39;) return ( &amp;lt;div&amp;gt; &amp;lt;h2&amp;gt;{name}&amp;lt;/h2&amp;gt; &amp;lt;input onChange={e =&amp;gt; setName(e.target.value)} /&amp;gt; &amp;lt;/div&amp;gt; ) }   Don’t call Hooks inside loops, conditions, or nested functions Only Call Hooks from React Functions  let state = []; let setters = []; let firstRun = true; let cursor = 0; function createSetter(cursor) { return function setterWithCursor(newVal) { state[cursor] = newVal; }; } export function useState(initVal) { if (firstRun) { state.</description>
+    </item>
+    
+    <item>
+      <title>React 组件设计原则</title>
+      <link>http://topgrd.github.io/post/2/</link>
+      <pubDate>Thu, 11 Oct 2018 03:30:16 +0000</pubDate>
+      
+      <guid>http://topgrd.github.io/post/2/</guid>
+      <description>组件的设计原则 react-component 这里的大多数组件是 ant design 的底层依赖，他们大都很好的遵循了我们的一些设计原则，这里简单概括下：
+职责清晰、单一职责
+ 组件里的每个模块，分别该承担某一个功能  多个组件 / 模块协同完成一件事，而不是一个组件替其他组件完成本该它自己完成的事情  开放与封闭  属性配置等 API 对外开放；组件内部 dom 及状态的更改、对外封闭  高内聚、低耦合  组件内部通过 callback 方式直接调用，组件与组件之间通过发布订阅的模式通信  避免信息冗余  例如：一个东西能被另一个推导出来，就只使用一个  API 尽量和已知概念保持一致  API 命名：比如 聚焦 常用命名是 focusable 而不是 canFocus 等自己臆想的名字、还有如 * onDeselect 等规范名字。 API 的功能要单一并表意：比如 active 表示活动状态、但不能代替表示 selected 选中状态。   前端组件设计杂谈</description>
+    </item>
+    
+    <item>
+      <title>React 绑定this 三种方式对比</title>
+      <link>http://topgrd.github.io/post/1/</link>
+      <pubDate>Wed, 22 Aug 2018 09:40:14 +0000</pubDate>
+      
+      <guid>http://topgrd.github.io/post/1/</guid>
+      <description>在react中，在组件事件上绑定this通常有三种写法
+ inline function  &amp;lt;Button onClick={() =&amp;gt; this.handleChange&amp;gt;&amp;lt;/Button&amp;gt;   class properties  class A { handleChange = () =&amp;gt; { coneole.log() } }   bind  class B { constructor() { this.handleChange = this.handleChange.bind(this) } handleChange() { console.log() } }  哪种方法相较而言更适合呢，这个在React的Github Issue里都已经有过多次讨论。https://github.com/facebook/react/issues/9851 根据Dan Abramov的说法，两者基本一致，但在Facebook内部使用的是第二种方法（calss properties）。
+虽然两者基本一致，但是肯定有细微的差别，第二种方法因为目前还不是ES的正式语法，所有需要使用babel插件babel-plugin-transform-class-properties进行转义，下面是babel转换A和B的代码
+var A = function A() { _classCallCheck(this, A); this.handleChange = function () { coneole.log(); }; }; var B = function () { function B() { _classCallCheck(this, B); this.</description>
+    </item>
+    
+  </channel>
+</rss>

@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+<meta charset="utf-8">
+<meta name="description" content="The last theme you&#39;ll ever need. Maybe.">
+<meta name="generator" content="Hugo 0.55.6" />
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="/css/style.css" type="text/css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Code+Pro:400,700" type="text/css">
+<link rel="stylesheet"
+      href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.8/styles/ocean.min.css">
+<link rel="alternate" href="/index.xml" type="application/rss+xml" title="TopGrd&#39;s Blog">
+<title>Articles - TopGrd&#39;s Blog</title>
+</head>
+<body>
+
+<header>
+  <div class="container clearfix">
+    <a class="path" href="http://topgrd.github.io/">[TopGrd&#39;s Blog]</a>
+    <span class="caret"># _</span>
+    <div class="right">
+      
+    </div>
+  </div>
+</header>
+
+<div class="container">
+
+
+<main role="main" class="article-list">
+  <h1 class="list-title">Articles</h1>
+  
+    <article class="list-item" itemscope itemtype="http://schema.org/Blog">
+  <h2 class="headline" itemprop="headline"><a href="/post/8/">Electron</a></h2>
+  <div class="meta">
+
+    <span class="key">published on</span>
+    <span class="val"><time itemprop="datePublished" datetime="2019-06-28">June 28, 2019</time></span>
+
+  </div>
+  <section class="summary">
+    Api demopark/electron-api-demos-Zh_CN
+ELECTRON_MIRROR=https://npm.taobao.org/mirrors/electron/ npm i electron  架构 主进程和渲染器进程 运行package.json的main脚本的进程被称为 主进程,一个 Electron 应用总是有且只有一个主进程 使用了Chromium 来展示 web 页面，Chromium 的多进程架构也被使用到。每个 Electron 中的 web 页面运行在它自己的渲染进程中。
+rebuild native-module 使用的包包含 C++ 的原生实现。所以在 pack 前需先用 electron-rebuild 做 rebuild。
+ rebuild 如果很慢，可能是要翻墙，可尝试 cnpmjs.org 提供的镜像，electron-rebuild -d=https://gh-contractor-zcbenz.cnpmjs.org/atom-shell/dist/。 GitHub - electron/electron-rebuild: Package to rebuild native Node.js modules against the currently installed Electron version
+ 在渲染进程中使用主进程模块 使用remote api, 在主进程中导出模块, remote | Electron
+// main services const pty = require('node-pty') module.exports = { pty } // main index.  <a href="/post/8/">Read More...</a>
+  </section>
+</article>
+
+  
+    <article class="list-item" itemscope itemtype="http://schema.org/Blog">
+  <h2 class="headline" itemprop="headline"><a href="/post/7/">JavaScript 命名规范 (转)</a></h2>
+  <div class="meta">
+
+    <span class="key">published on</span>
+    <span class="val"><time itemprop="datePublished" datetime="2019-06-28">June 28, 2019</time></span>
+
+  </div>
+  <section class="summary">
+     
+  </section>
+</article>
+
+  
+    <article class="list-item" itemscope itemtype="http://schema.org/Blog">
+  <h2 class="headline" itemprop="headline"><a href="/post/6/">NPM 发布ESM源码</a></h2>
+  <div class="meta">
+
+    <span class="key">published on</span>
+    <span class="val"><time itemprop="datePublished" datetime="2019-06-26">June 26, 2019</time></span>
+
+  </div>
+  <section class="summary">
+    Background &amp; Research 如果你调试的时候需要看所依赖的npm包的源码,一般包的入口main都指向dist里被babel或rollup编译过的es5代码。
+{ &quot;name&quot;: &quot;my-package&quot;, &quot;version&quot;: &quot;0.1.0&quot;, &quot;main&quot;: &quot;dist/index.js&quot; }  会指示你的打包工具在require 或 import的时候找到正确的入口文件在哪，但是现在有种更推荐的方式是同时发布编译后的 es5 代码和 es2015+ 源码，让用户选择。
+Why?  es2015后，如果使用webpack或rollup构建，可以利用ES Module的很多特性, 加快打包速度, 还可以利用 treeshaking 每个npm包自行编译，很多模块重复引入，增加代码体积（runtime可能不同） 转译的结果是固定的，不能根据平台和市场自定义化 如果编译工具产生隐藏的bug代码，发布到npm上，被大量下载，即使用户编译工具修复了bug，也无法影响包中的源码，只能等待维护者修复。 发布多种版本库在业内已成为一种标准  How? publish 将 package.json 的main直接指向es6代码，会产生2个问题。
+ 在基本上用户webpack编译的时候会选择exclude掉 node_modules下的文件, 这样可以极大的提升编译速度。所以默认都是在npm上发布es5规范的代码。 如果是node环境的代码，说不会经过构建工具的，不支持es6的话直接运行不起了  因此 package.json 中的main指向es5版本代码，要解决这个问题，rollup提出了module字段，现在也被webpack等构建工具所支持。当构建工具遇到我们的模块时，优先使用module字段入口。然后使用main入口。
+创建 library
+webpack config exclude替换为inclue
+{ test: /\.(js|jsx)$/, - exclude: /node_modules/, + include: [ + path.resolve('./src'), + path.resolve('./node_modules/carno') + ], use: { loader: 'babel-loader', }, }  Research 这里取redux模块进行研究  <a href="/post/6/">Read More...</a>
+  </section>
+</article>
+
+  
+</main>
+
+  <nav class="paginator">
+    
+    <a class="nav-left" href="/post/">&lt; Prev</a>
+    
+
+    <span>2 / 4</span>
+
+    
+    <a class="nav-right" href="/post/page/3/">Next &gt;</a>
+    
+  </nav>
+
+
+</div>
+
+<footer>
+  <div class="container">
+    <span class="copyright">&copy; 2019 TopGrd&#39;s Blog - <a rel="license" href="http://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a></span>
+  </div>
+</footer>
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.8/highlight.min.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+</body>
+</html>
+
