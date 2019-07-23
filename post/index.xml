@@ -12,6 +12,19 @@
     
     
     <item>
+      <title>webpack 按需加载原理</title>
+      <link>http://topgrd.github.io/post/12/</link>
+      <pubDate>Mon, 22 Jul 2019 12:58:19 +0000</pubDate>
+      
+      <guid>http://topgrd.github.io/post/12/</guid>
+      <description>定义 jack.js
+export default () =&amp;gt; { console.log(&#39;fafa&#39;); };  mark.js
+export const val = &#39;sd&#39;; export default () =&amp;gt; { console.log(&#39;jaja&#39;); };  index.js
+const name = &#39;jack&#39;; import(&#39;./mark&#39;).then(mark =&amp;gt; mark()); import(&#39;./jack&#39;).then(jack =&amp;gt; jack()); export default name;  使用 webpack 打包
+(function(modules) { // webpackBootstrap // install a JSONP callback for chunk loading function webpackJsonpCallback(data) {} // The module cache var installedModules = {}; // 用来存储加载过和加载中的 chunk // undefined = chunk not loaded, null = chunk preloaded/prefetched // Promise = chunk loading, 0 = chunk loaded var installedChunks = { main: 0, }; // script path function function jsonpScriptSrc(chunkId) { return __webpack_require__.</description>
+    </item>
+    
+    <item>
       <title>构造函数中的 return</title>
       <link>http://topgrd.github.io/post/11/</link>
       <pubDate>Mon, 15 Jul 2019 05:35:56 +0000</pubDate>

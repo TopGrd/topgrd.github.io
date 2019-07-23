@@ -31,6 +31,26 @@
   <h1 class="list-title">Articles</h1>
   
     <article class="list-item" itemscope itemtype="http://schema.org/Blog">
+  <h2 class="headline" itemprop="headline"><a href="/post/6/">NPM 发布ESM源码</a></h2>
+  <div class="meta">
+
+    <span class="key">published on</span>
+    <span class="val"><time itemprop="datePublished" datetime="2019-06-26">June 26, 2019</time></span>
+
+  </div>
+  <section class="summary">
+    Background &amp; Research 如果你调试的时候需要看所依赖的npm包的源码,一般包的入口main都指向dist里被babel或rollup编译过的es5代码。
+{ &quot;name&quot;: &quot;my-package&quot;, &quot;version&quot;: &quot;0.1.0&quot;, &quot;main&quot;: &quot;dist/index.js&quot; }  会指示你的打包工具在require 或 import的时候找到正确的入口文件在哪，但是现在有种更推荐的方式是同时发布编译后的 es5 代码和 es2015+ 源码，让用户选择。
+Why?  es2015后，如果使用webpack或rollup构建，可以利用ES Module的很多特性, 加快打包速度, 还可以利用 treeshaking 每个npm包自行编译，很多模块重复引入，增加代码体积（runtime可能不同） 转译的结果是固定的，不能根据平台和市场自定义化 如果编译工具产生隐藏的bug代码，发布到npm上，被大量下载，即使用户编译工具修复了bug，也无法影响包中的源码，只能等待维护者修复。 发布多种版本库在业内已成为一种标准  How? publish 将 package.json 的main直接指向es6代码，会产生2个问题。
+ 在基本上用户webpack编译的时候会选择exclude掉 node_modules下的文件, 这样可以极大的提升编译速度。所以默认都是在npm上发布es5规范的代码。 如果是node环境的代码，说不会经过构建工具的，不支持es6的话直接运行不起了  因此 package.json 中的main指向es5版本代码，要解决这个问题，rollup提出了module字段，现在也被webpack等构建工具所支持。当构建工具遇到我们的模块时，优先使用module字段入口。然后使用main入口。
+创建 library
+webpack config exclude替换为inclue
+{ test: /\.(js|jsx)$/, - exclude: /node_modules/, + include: [ + path.resolve('./src'), + path.resolve('./node_modules/carno') + ], use: { loader: 'babel-loader', }, }  Research 这里取redux模块进行研究  <a href="/post/6/">Read More...</a>
+  </section>
+</article>
+
+  
+    <article class="list-item" itemscope itemtype="http://schema.org/Blog">
   <h2 class="headline" itemprop="headline"><a href="/post/5/">Node 性能优化与问题排查</a></h2>
   <div class="meta">
 
@@ -74,21 +94,6 @@ const router = require('koa-router')(); const fs = require('fs'); const profiler
     Prettier 为什么要用 Prettier？ 关于代码风格的圣战，从到底要不要分号，缩进用tab还是space，2个还是4个空格，从未停止过。但是作为现代javascript 开发者，who cares ! 我们使用eslint 就可以轻松的控制团队的代码风格，但是 eslint 在某些方面就无法强制了，下面2份代码
 if (a &lt; 1) { console.log('haha'); }  if (a &lt; 1) { console.log('haha'); }  Eslint 都不会报错，还有 trailing commas，Why you should enforce Dangling Commas for Multiline Statements 等等。而prettier + eslint 可以完美的避免这些风格不统一的问题。当你的风格与团队 eslint 配置有不同时，只需要prettier一下，就可以保持一致，不需要在写代码时关心差异，并且 prettier 也是当前最火的一款 format 工具，很多开源项目下面，你会发现都会有一份 .prettierrc
  By far the biggest reason for adopting Prettier is to stop all the on-going debates over styles. It is generally accepted that having a common style guide is valuable for a project and team.  <a href="/post/4/">Read More...</a>
-  </section>
-</article>
-
-  
-    <article class="list-item" itemscope itemtype="http://schema.org/Blog">
-  <h2 class="headline" itemprop="headline"><a href="/post/3/">React hooks: not magic, just arrays </a></h2>
-  <div class="meta">
-
-    <span class="key">published on</span>
-    <span class="val"><time itemprop="datePublished" datetime="2018-11-02">November 02, 2018</time></span>
-
-  </div>
-  <section class="summary">
-    https://medium.com/@ryardley/react-hooks-not-magic-just-arrays-cd4f1857236e
-function Info() { const [name, setName] = useState('Topgrd') return ( &lt;div&gt; &lt;h2&gt;{name}&lt;/h2&gt; &lt;input onChange={e =&gt; setName(e.target.value)} /&gt; &lt;/div&gt; ) }   Don’t call Hooks inside loops, conditions, or nested functions Only Call Hooks from React Functions  let state = []; let setters = []; let firstRun = true; let cursor = 0; function createSetter(cursor) { return function setterWithCursor(newVal) { state[cursor] = newVal; }; } export function useState(initVal) { if (firstRun) { state.  <a href="/post/3/">Read More...</a>
   </section>
 </article>
 

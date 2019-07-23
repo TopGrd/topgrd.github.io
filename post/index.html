@@ -31,6 +31,24 @@
   <h1 class="list-title">Articles</h1>
   
     <article class="list-item" itemscope itemtype="http://schema.org/Blog">
+  <h2 class="headline" itemprop="headline"><a href="/post/12/">webpack 按需加载原理</a></h2>
+  <div class="meta">
+
+    <span class="key">published on</span>
+    <span class="val"><time itemprop="datePublished" datetime="2019-07-22">July 22, 2019</time></span>
+
+  </div>
+  <section class="summary">
+    定义 jack.js
+export default () =&gt; { console.log('fafa'); };  mark.js
+export const val = 'sd'; export default () =&gt; { console.log('jaja'); };  index.js
+const name = 'jack'; import('./mark').then(mark =&gt; mark()); import('./jack').then(jack =&gt; jack()); export default name;  使用 webpack 打包
+(function(modules) { // webpackBootstrap // install a JSONP callback for chunk loading function webpackJsonpCallback(data) {} // The module cache var installedModules = {}; // 用来存储加载过和加载中的 chunk // undefined = chunk not loaded, null = chunk preloaded/prefetched // Promise = chunk loading, 0 = chunk loaded var installedChunks = { main: 0, }; // script path function function jsonpScriptSrc(chunkId) { return __webpack_require__.  <a href="/post/12/">Read More...</a>
+  </section>
+</article>
+
+  
+    <article class="list-item" itemscope itemtype="http://schema.org/Blog">
   <h2 class="headline" itemprop="headline"><a href="/post/11/">构造函数中的 return</a></h2>
   <div class="meta">
 
@@ -58,23 +76,6 @@ var Parent = function Parent() { _classCallCheck(this, Parent); this.name = 'tom
 export const val = 'sd'; export default () =&gt; { console.log('jaja'); };  index.js
 import mark from './mark'; const name = 'jack'; mark(); export default name;  下面的代码是 webpack 打包后生成的代码
 (function(modules) { // webpackBootstrap // The module cache var installedModules = {}; // The require function function __webpack_require__(moduleId) { // Check if module is in cache if (installedModules[moduleId]) { return installedModules[moduleId].exports; } // Create a new module (and put it into the cache) var module = (installedModules[moduleId] = { i: moduleId, l: false, exports: {}, }); // Execute the module function modules[moduleId].  <a href="/post/10/">Read More...</a>
-  </section>
-</article>
-
-  
-    <article class="list-item" itemscope itemtype="http://schema.org/Blog">
-  <h2 class="headline" itemprop="headline"><a href="/post/9/">模拟 React Hooks</a></h2>
-  <div class="meta">
-
-    <span class="key">published on</span>
-    <span class="val"><time itemprop="datePublished" datetime="2019-07-06">July 06, 2019</time></span>
-
-  </div>
-  <section class="summary">
-    首先 我们先模拟一个useState
-function useState(initVal) { let _val = initVal; const state = _val; function setState(newVal) { _val = newVal; } return [state, setState]; } const [count, setCount] = useState(0); console.log(count); setCount(2); console.log(count);  但是log 出来的count并不是我们所期望的 0 2，而是 0 0; 为什么呢？ 因为在[count, setCount] = useState(0)count 复制的是 initVal, 修改 _val 的值， 而 count 仍然是initVal的值
-如何让他恢复正常呢，我们可以使用方法来获取state
-function useState(initVal) { let _val = initVal; const state = () =&gt; _val; function setState(newVal) { _val = newVal; } return [state, setState]; } const [count, setCount] = useState(0); console.  <a href="/post/9/">Read More...</a>
   </section>
 </article>
 

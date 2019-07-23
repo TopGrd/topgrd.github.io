@@ -51,6 +51,23 @@
   <div class="article-list">
     
       <article class="list-item" itemscope itemtype="http://schema.org/Blog">
+  <h2 class="headline" itemprop="headline"><a href="/post/9/">模拟 React Hooks</a></h2>
+  <div class="meta">
+
+    <span class="key">published on</span>
+    <span class="val"><time itemprop="datePublished" datetime="2019-07-06">July 06, 2019</time></span>
+
+  </div>
+  <section class="summary">
+    首先 我们先模拟一个useState
+function useState(initVal) { let _val = initVal; const state = _val; function setState(newVal) { _val = newVal; } return [state, setState]; } const [count, setCount] = useState(0); console.log(count); setCount(2); console.log(count);  但是log 出来的count并不是我们所期望的 0 2，而是 0 0; 为什么呢？ 因为在[count, setCount] = useState(0)count 复制的是 initVal, 修改 _val 的值， 而 count 仍然是initVal的值
+如何让他恢复正常呢，我们可以使用方法来获取state
+function useState(initVal) { let _val = initVal; const state = () =&gt; _val; function setState(newVal) { _val = newVal; } return [state, setState]; } const [count, setCount] = useState(0); console.  <a href="/post/9/">Read More...</a>
+  </section>
+</article>
+
+    
+      <article class="list-item" itemscope itemtype="http://schema.org/Blog">
   <h2 class="headline" itemprop="headline"><a href="/post/8/">Electron</a></h2>
   <div class="meta">
 
@@ -79,26 +96,6 @@ rebuild native-module 使用的包包含 C++ 的原生实现。所以在 pack �
   </div>
   <section class="summary">
      
-  </section>
-</article>
-
-    
-      <article class="list-item" itemscope itemtype="http://schema.org/Blog">
-  <h2 class="headline" itemprop="headline"><a href="/post/6/">NPM 发布ESM源码</a></h2>
-  <div class="meta">
-
-    <span class="key">published on</span>
-    <span class="val"><time itemprop="datePublished" datetime="2019-06-26">June 26, 2019</time></span>
-
-  </div>
-  <section class="summary">
-    Background &amp; Research 如果你调试的时候需要看所依赖的npm包的源码,一般包的入口main都指向dist里被babel或rollup编译过的es5代码。
-{ &quot;name&quot;: &quot;my-package&quot;, &quot;version&quot;: &quot;0.1.0&quot;, &quot;main&quot;: &quot;dist/index.js&quot; }  会指示你的打包工具在require 或 import的时候找到正确的入口文件在哪，但是现在有种更推荐的方式是同时发布编译后的 es5 代码和 es2015+ 源码，让用户选择。
-Why?  es2015后，如果使用webpack或rollup构建，可以利用ES Module的很多特性, 加快打包速度, 还可以利用 treeshaking 每个npm包自行编译，很多模块重复引入，增加代码体积（runtime可能不同） 转译的结果是固定的，不能根据平台和市场自定义化 如果编译工具产生隐藏的bug代码，发布到npm上，被大量下载，即使用户编译工具修复了bug，也无法影响包中的源码，只能等待维护者修复。 发布多种版本库在业内已成为一种标准  How? publish 将 package.json 的main直接指向es6代码，会产生2个问题。
- 在基本上用户webpack编译的时候会选择exclude掉 node_modules下的文件, 这样可以极大的提升编译速度。所以默认都是在npm上发布es5规范的代码。 如果是node环境的代码，说不会经过构建工具的，不支持es6的话直接运行不起了  因此 package.json 中的main指向es5版本代码，要解决这个问题，rollup提出了module字段，现在也被webpack等构建工具所支持。当构建工具遇到我们的模块时，优先使用module字段入口。然后使用main入口。
-创建 library
-webpack config exclude替换为inclue
-{ test: /\.(js|jsx)$/, - exclude: /node_modules/, + include: [ + path.resolve('./src'), + path.resolve('./node_modules/carno') + ], use: { loader: 'babel-loader', }, }  Research 这里取redux模块进行研究  <a href="/post/6/">Read More...</a>
   </section>
 </article>
 

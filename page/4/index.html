@@ -51,6 +51,21 @@
   <div class="article-list">
     
       <article class="list-item" itemscope itemtype="http://schema.org/Blog">
+  <h2 class="headline" itemprop="headline"><a href="/post/3/">React hooks: not magic, just arrays </a></h2>
+  <div class="meta">
+
+    <span class="key">published on</span>
+    <span class="val"><time itemprop="datePublished" datetime="2018-11-02">November 02, 2018</time></span>
+
+  </div>
+  <section class="summary">
+    https://medium.com/@ryardley/react-hooks-not-magic-just-arrays-cd4f1857236e
+function Info() { const [name, setName] = useState('Topgrd') return ( &lt;div&gt; &lt;h2&gt;{name}&lt;/h2&gt; &lt;input onChange={e =&gt; setName(e.target.value)} /&gt; &lt;/div&gt; ) }   Don’t call Hooks inside loops, conditions, or nested functions Only Call Hooks from React Functions  let state = []; let setters = []; let firstRun = true; let cursor = 0; function createSetter(cursor) { return function setterWithCursor(newVal) { state[cursor] = newVal; }; } export function useState(initVal) { if (firstRun) { state.  <a href="/post/3/">Read More...</a>
+  </section>
+</article>
+
+    
+      <article class="list-item" itemscope itemtype="http://schema.org/Blog">
   <h2 class="headline" itemprop="headline"><a href="/post/2/">React 组件设计原则</a></h2>
   <div class="meta">
 
